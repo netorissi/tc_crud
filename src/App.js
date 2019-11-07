@@ -1,26 +1,29 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Fragment } from 'react';
+import { withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { CssBaseline } from '@material-ui/core';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+// ## --------- COMPONENTS --------- ## //
+import Toaster from './components/Toaster';
+
+// ## --------- ROUTES --------- ## //
+import Routes from './routes/constructor';
+
+const App = props => {
+
+	const toaster = props.toaster;
+
+	return (
+		<Fragment>
+			<CssBaseline />
+			<Toaster {...toaster} />
+			<Routes />
+		</Fragment>
+	)
 }
 
-export default App;
+const mapStateToProps = state => ({
+	toaster: state.rdToaster
+});
+
+export default withRouter(connect(mapStateToProps)(App));

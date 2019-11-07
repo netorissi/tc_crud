@@ -1,0 +1,23 @@
+.menu-layout {
+    width: 1000px;
+    margin-left: 280px;
+}
+
+.menu-left {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 280px;
+    background-color: #0e1823;
+    min-height: 100%;
+}
+
+.logo-tc {
+    display: flex;
+    justify-content: center;
+    padding: 50px;
+}
+
+.logo-tc img {
+    max-width: 80px;
+}

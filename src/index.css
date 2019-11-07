@@ -1,13 +1,48 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  width: 100%;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+#root {
+  width: 100%;
+  min-height: 100vh;
+  background-color:#1f2d40;
+  color:#f5f5f5;
+}
+
+.main {
+  position: relative;
+  max-width: 1280px;
+  margin: auto;
+}
+
+.input-text {
+  width: 100%;
+}
+
+.input-text label {
+  color: #f5f5f5;
+}
+
+.input-text fieldset {
+  border-color: #f5f5f5;
+}
+
+.MuiInputBase-root {
+  color: #f5f5f5 !important;
+}
+
+.MuiInput-underline:before {
+  border-bottom: 1px solid #f5f5f5 !important;
+}
+
+.pd-20 {
+  padding: 20px;
+}
+
+.btn-register {
+  width: 100%;
+  height: 56px;
 }
