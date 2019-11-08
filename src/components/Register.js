@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import axios from 'axios';
-import { BASE_ENDPOINT } from '../routes/names';
+import { BASE_ENDPOINT_MS } from '../routes/names';
 import { Grid, TextField, Button, MenuItem } from '@material-ui/core';
 import { MdSave, MdSend, MdDelete, MdClear } from 'react-icons/md';
-import * as formatters from '../helpers/formatters';
+import { numberToReal } from '../helpers/formatters';
 import * as acVehicles from '../actions/vehicles';
 
 const newVehicle = {
@@ -24,6 +24,8 @@ class Register extends Component {
         super(props);
 
         const { vehicleCurrent } = this.props;
+        if (vehicleCurrent)
+            vehicleCurrent.price = numberToReal(parseFloat(vehicleCurrent.price).toFixed(2));
 
         this.state = {
             vehicle: vehicleCurrent ? {...vehicleCurrent} : {...newVehicle},
@@ -34,21 +36,12 @@ class Register extends Component {
     }
 
     async componentDidMount() {
-
-        await axios.get(`${BASE_ENDPOINT}/`)
-    .then(resp => console.log(resp.data))
-    // .then(resp => response = resp.data.online)
-    .catch(error => console.log("DEU RUIM", error));
-
-        const resp = acVehicles.checkStatusApi();
-        console.log(resp)
 		await this.getBrands();
 	}
 
     getBrands = async () => {
-		await axios.get(BASE_ENDPOINT + '/brands')
+		await axios.get(BASE_ENDPOINT_MS + '/brands')
 		.then(resp => {
-            console.log(resp.data);
 			if (resp.data)
 				this.setState({ arrayBrands: resp.data.brands });
 		})
@@ -60,7 +53,7 @@ class Register extends Component {
 		
 		const arrayResp = arrayBrands.map(marca => {
 			return (
-				<MenuItem key={marca.id} value={marca.id}>
+				<MenuItem key={marca.id} value={marca.name}>
 					{marca.name}
 				</MenuItem>
 			)
@@ -83,7 +76,7 @@ class Register extends Component {
         if (field === "km")
             vehicle.km = event.target.value;
         if (field === "price")
-            vehicle.price = formatters.numberToReal(event.target.value);
+            vehicle.price = numberToReal(event.target.value);
             
             
         if (vehicle.id) this.setState({ vehicle, saveEdit: true });
@@ -113,13 +106,15 @@ class Register extends Component {
 
     saveVehicle = async () => {
         const { vehicle, checkForm, saveEdit } = this.state;
-        const { dispatch } = this.props;
+        const { dispatch, homeStep } = this.props;
 
         if (checkForm) {
             if (vehicle.id && saveEdit)
                 await dispatch(acVehicles.putVehicles(vehicle));
             else
                 await dispatch(acVehicles.postVehicles(vehicle));
+
+            homeStep();
         }
     }
     
@@ -170,6 +165,7 @@ class Register extends Component {
                 <Grid item xs={12} className="pd-20">
                     <TextField
                     select
+                    variant="outlined"
                     label="Marca"
                     className="input-text"
                     value={vehicle.brand}
@@ -212,6 +208,7 @@ class Register extends Component {
                                     color="secondary"
                                     endIcon={<MdDelete/>}
                                     onClick={() => this.removeVehicle(vehicle.id)}
+                                    style={{ marginRight: 10 }}
                                 >
                                     Remover
                                 </Button>
@@ -230,7 +227,7 @@ class Register extends Component {
                                 <Button
                                     disabled={!checkForm || !saveEdit}
                                     variant="contained"
-                                    color="secondary"
+                                    color="primary"
                                     endIcon={<MdSave/>}
                                     onClick={this.saveVehicle}
                                 >

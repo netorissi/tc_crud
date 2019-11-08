@@ -8,13 +8,55 @@ const setVehicles = vehicles => ({
 	payload: { vehicles }
 });
 
-export const getVehicles = textFilter => async dispatch => {
+// export const getVehicles = textFilter => async dispatch => { // TRADERSCLUB
 
-    if (textFilter) {
-        await axios.get(`${BASE_ENDPOINT}/cars?search=${textFilter}`)
-        .then(async resp => {
-            const vehicles = resp.data || [];
-            await dispatch(setVehicles(vehicles));
+//     if (textFilter) {
+//         await axios.get(`${BASE_ENDPOINT}/cars?search=${textFilter}`)
+//         .then(async resp => {
+//             const vehicles = resp.data.cars || [];
+//             await dispatch(setVehicles(vehicles));
+//         })
+//         .catch(async error => {
+//             console.log("DEU RUIM", error)
+//             await dispatch(acToaster.ACTIVE_TOASTER(
+//                 'error',
+//                 'Ocorreu um erro inesperado!'
+//             ))
+            
+//         })
+//     }
+// }
+
+export const getVehicles = () => async dispatch => {
+    
+    await axios.get(`${BASE_ENDPOINT}/cars`)
+    .then(async resp => {
+        const vehicles = resp.data || [];
+        await dispatch(setVehicles(vehicles));
+    })
+    .catch(async error => {
+        console.log("DEU RUIM", error)
+        await dispatch(acToaster.ACTIVE_TOASTER(
+            'error',
+            'Ocorreu um erro inesperado!'
+        ))
+        
+    })
+}
+
+export const postVehicles = vehicle => async dispatch => {
+
+    if (vehicle) {
+
+        vehicle.price = vehicle.price.replace('.', '').replace(',', '.');
+
+        await axios.post(`${BASE_ENDPOINT}/cars`, vehicle)
+        .then(async () => {
+            await  dispatch(getVehicles());
+            await dispatch(acToaster.ACTIVE_TOASTER(
+                'success',
+                'Novo cadastro realizado com sucesso!'
+            ))
         })
         .catch(async error => {
             console.log("DEU RUIM", error)
@@ -27,44 +69,29 @@ export const getVehicles = textFilter => async dispatch => {
     }
 }
 
-export const postVehicles = vehicle => async dispatch => {
-
-	await axios.post(`${BASE_ENDPOINT}/cars`, vehicle)
-    .then(async () => {
-        await  dispatch(getVehicles());
-        await dispatch(acToaster.ACTIVE_TOASTER(
-            'success',
-            'Novo cadastro realizado com sucesso!'
-        ))
-    })
-    .catch(async error => {
-        console.log("DEU RUIM", error)
-        await dispatch(acToaster.ACTIVE_TOASTER(
-            'error',
-            'Ocorreu um erro inesperado!'
-        ))
-        
-    })
-}
-
 export const putVehicles = vehicle => async dispatch => {
 
-	await axios.put(`${BASE_ENDPOINT}/cars/${vehicle.id}`, vehicle)
-    .then(async () => {
-        await  dispatch(getVehicles());
-        await dispatch(acToaster.ACTIVE_TOASTER(
-            'success',
-            'Cadastro atualizado com sucesso!'
-        ))
-    })
-    .catch(async error => {
-        console.log("DEU RUIM", error)
-        await dispatch(acToaster.ACTIVE_TOASTER(
-            'error',
-            'Ocorreu um erro inesperado!'
-        ))
+    if (vehicle) {
         
-    })
+        vehicle.price = vehicle.price.replace('.', '').replace(',', '.');
+
+        await axios.put(`${BASE_ENDPOINT}/cars/${vehicle.id}`, vehicle)
+        .then(async () => {
+            await  dispatch(getVehicles());
+            await dispatch(acToaster.ACTIVE_TOASTER(
+                'success',
+                'Cadastro atualizado com sucesso!'
+            ))
+        })
+        .catch(async error => {
+            console.log("DEU RUIM", error)
+            await dispatch(acToaster.ACTIVE_TOASTER(
+                'error',
+                'Ocorreu um erro inesperado!'
+            ))
+            
+        })
+    }
 }
 
 export const deleteVehicles = vehicleId => async dispatch => {
@@ -85,15 +112,4 @@ export const deleteVehicles = vehicleId => async dispatch => {
         ))
         
     })
-}
-
-export const checkStatusApi = async () => {
-    let response = false;
-
-    await axios.get(BASE_ENDPOINT)
-    .then(resp => console.log(resp.data))
-    // .then(resp => response = resp.data.online)
-    .catch(error => console.log("DEU RUIM", error.response));
-
-    return response;
 }

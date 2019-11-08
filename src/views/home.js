@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
 import '../assets/styles/home.css';
 import { Grid, Button, TextField } from '@material-ui/core';
 import Register from '../components/Register';
+import ListVehicles from '../components/ListVehicles';
 import * as acVehicles from '../actions/vehicles';
 
 const STEP_EMPTY = 0;
@@ -12,17 +15,30 @@ class Home extends Component {
 
     state = {
         stepCurrent: STEP_EMPTY,
-        vehicleCurrent: null
+        vehicleCurrent: null,
+        textFilter: '',
+        searchParam: ''
     }
 
-    sendSearch = async () => {
+    componentDidMount() {
+        const { dispatch } = this.props;
+        dispatch(acVehicles.getVehicles());
+    }
+
+    changeSearch = event => {
+        this.setState({ textFilter: event.target.value });
+        if (!event.target.value) this.homeStep();
+    }
+
+    sendSearch = async event => {
+        event.preventDefault();
         const { textFilter } = this.state;
-        const { dispatch } = this.state;
         if (textFilter) {
-            await dispatch(acVehicles.getVehicles(textFilter));
-            this.setState({ stepCurrent: STEP_LIST });
+            this.setState({ stepCurrent: STEP_LIST, searchParam: textFilter });
         }
-        else this.homeStep();
+        else {
+            this.homeStep();
+        }
     }
 
     newRegister = () => {
@@ -42,24 +58,29 @@ class Home extends Component {
     homeStep = () => {
         this.setState({ 
             stepCurrent: STEP_EMPTY,
-            vehicleCurrent: null
+            vehicleCurrent: null,
+            textFilter: '',
+            searchParam: ''
         });
     }
 
     render() {
 
-        const { stepCurrent, vehicleCurrent } = this.state;
+        const { stepCurrent, vehicleCurrent, textFilter, searchParam } = this.state;
+        const { vehicles } = this.props.rdVehicles;
 
         return (
             <Grid container>
                 <Grid item xs={12}>
                     <Grid container>
                         <Grid item md={10} sm={6} xs={12} className="pd-20">
-                            <form onSubmit={this.sendForm} style={{ width: '100%' }}>
+                            <form onSubmit={this.sendSearch} style={{ width: '100%' }}>
                                 <TextField
                                 className="input-text"
                                 label="Pesquisar por um veículo"
                                 variant="outlined"
+                                value={textFilter}
+                                onChange={evt => this.changeSearch(evt)}
                                 />
                             </form>
                         </Grid>
@@ -83,9 +104,11 @@ class Home extends Component {
                                 </h1>
                             )}
                             {stepCurrent === STEP_LIST && (
-                                <h1>
-                                    LISTA
-                                </h1>
+                                <ListVehicles
+                                vehicles={vehicles}
+                                searchParam={searchParam}
+                                editRegister={this.editRegister}
+                                />
                             )}
                             {stepCurrent === STEP_REGISTER && (
                                 <Register
@@ -101,4 +124,8 @@ class Home extends Component {
     }
 }
 
-export default Home;
+const mapStateToProps = state => ({
+	rdVehicles: state.rdVehicles
+})
+
+export default withRouter(connect(mapStateToProps)(Home));
