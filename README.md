@@ -28,6 +28,7 @@ No projeto foram utilizados:
 - Redux
 - Redux-Thunk
 - React-router-dom
+- Material-UI
 - Axios para fazer as requisições
 - React-Icons
 - Paginação na listagem de veículos
